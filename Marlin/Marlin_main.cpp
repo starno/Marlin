@@ -339,6 +339,9 @@ bool setTargetedHotend(int code);
 
 #ifdef EUCLID_PLATFORM
 void doPlatformLeveling();
+//void moveToXYZ();
+//void pressButton();
+void pokeButton();
 #endif
 
 void serial_echopair_P(const char *s_P, float v)
@@ -1808,6 +1811,12 @@ void process_commands()
     case 33:
       doPlatformLeveling();
       break;
+      
+    case 34:    
+ //     moveToXYZ();
+      pokeButton();
+      break;
+      
 #endif
 
     case 42: //M42 -Change pin status via gcode
@@ -3694,7 +3703,7 @@ void doPlatformLeveling()
   z=pressButton(ZTOWER_X, ZTOWER_Y, HOVER_HEIGHT, BUTTON_MIN);
   zTower[X_AXIS]=ZTOWER_X;
   zTower[Y_AXIS]=ZTOWER_Y;
-  zTower[Z_AXIS]=z+BUILD_PLANE_OFFSET;
+  zTower[Z_AXIS]=z;
   moveToXYZ(ZTOWER_X, ZTOWER_Y,HOVER_HEIGHT);    //z hover
   delay(50); // Give the motion planner time to pick up the command
   
@@ -3703,7 +3712,7 @@ void doPlatformLeveling()
   z=pressButton(XTOWER_X, XTOWER_Y, HOVER_HEIGHT, BUTTON_MIN);
   xTower[X_AXIS]=XTOWER_X;
   xTower[Y_AXIS]=XTOWER_Y;
-  xTower[Z_AXIS]=z+BUILD_PLANE_OFFSET;
+  xTower[Z_AXIS]=z;
   moveToXYZ(XTOWER_X, XTOWER_Y,HOVER_HEIGHT);    //x hover
   delay(50); // Give the motion planner time to pick up the command
 
@@ -3712,7 +3721,7 @@ void doPlatformLeveling()
   z=pressButton(YTOWER_X, YTOWER_Y, HOVER_HEIGHT, BUTTON_MIN);
   yTower[X_AXIS]=YTOWER_X;
   yTower[Y_AXIS]=YTOWER_Y;
-  yTower[Z_AXIS]=z+BUILD_PLANE_OFFSET;
+  yTower[Z_AXIS]=z;
   moveToXYZ(YTOWER_X, YTOWER_Y,HOVER_HEIGHT);    //y hover
   delay(50); // Give the motion planner time to pick up the command
 
@@ -3724,5 +3733,25 @@ void doPlatformLeveling()
   SERIAL_ECHO(zTower[Z_AXIS]);
   SERIAL_ECHO("\n");
 }
+
+void pokeButton()
+{
+  float xTower[3];
+  float yTower[3];
+  float zTower[3];
+//  float[3] planeVector1, planeVector2, normalVector;
+
+  pinMode(BUILD_PLANE_BUTTON_PIN,INPUT_PULLUP);
+  //float x;
+  //float y;
+  float z;
+  z=pressButton(destination[X_AXIS], destination[Y_AXIS], destination[Z_AXIS], BUTTON_MIN);
+  moveToXYZ(destination[X_AXIS], destination[Y_AXIS],HOVER_HEIGHT);    // hover
+  delay(50); // Give the motion planner time to pick up the command
+  
+  SERIAL_ECHO("\nXYZ ");
+  SERIAL_ECHO(z);
+  SERIAL_ECHO("\n");
+}  
 #endif
 
