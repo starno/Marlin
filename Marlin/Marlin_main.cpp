@@ -337,6 +337,10 @@ boolean chdkActive = false;
 void get_arc_coordinates();
 bool setTargetedHotend(int code);
 
+#ifdef EUCLID_PLATFORM
+void doPlatformLeveling();
+#endif
+
 void serial_echopair_P(const char *s_P, float v)
     { serialprintPGM(s_P); SERIAL_ECHO(v); }
 void serial_echopair_P(const char *s_P, double v)
@@ -1771,6 +1775,7 @@ void process_commands()
           starttime=millis(); //procedure calls count as normal print time.
       }
     } break;
+    
     case 928: //M928 - Start SD write
       starpos = (strchr(strchr_pointer + 5,'*'));
       if(starpos != NULL){
@@ -1798,6 +1803,13 @@ void process_commands()
       autotempShutdown();
       }
       break;
+      
+#ifdef EUCLID_PLATFORM
+    case 33:
+      doPlatformLeveling();
+      break;
+#endif
+
     case 42: //M42 -Change pin status via gcode
       if (code_seen('S'))
       {
@@ -3641,4 +3653,76 @@ bool setTargetedHotend(int code){
   }
   return false;
 }
+
+#ifdef EUCLID_PLATFORM
+
+void moveToXYZ(float x, float y, float z)
+{
+  destination[X_AXIS] = x;
+  destination[Y_AXIS] = y;
+  destination[Z_AXIS] = z;
+  prepare_move();
+}
+
+float pressButton(float x, float y, float zHover, float zMin)
+{
+  float z=zHover;
+  
+  while((digitalRead(BUILD_PLANE_BUTTON_PIN)==HIGH) && (z > zMin)) //go until we hit the button
+    {
+      moveToXYZ(x, y, z);
+      //delay(50);
+      z-=0.01;
+    }
+  SERIAL_ECHO(z);
+  return z;  
+}
+
+void doPlatformLeveling()
+{
+  float xTower[3];
+  float yTower[3];
+  float zTower[3];
+//  float[3] planeVector1, planeVector2, normalVector;
+
+  pinMode(BUILD_PLANE_BUTTON_PIN,INPUT_PULLUP);
+  float z;
+  moveToXYZ(0,0,50);        // center 
+
+  // Find the Z tower button
+  moveToXYZ(ZTOWER_X, ZTOWER_Y,HOVER_HEIGHT);    //z hover
+  z=pressButton(ZTOWER_X, ZTOWER_Y, HOVER_HEIGHT, BUTTON_MIN);
+  zTower[X_AXIS]=ZTOWER_X;
+  zTower[Y_AXIS]=ZTOWER_Y;
+  zTower[Z_AXIS]=z+BUILD_PLANE_OFFSET;
+  moveToXYZ(ZTOWER_X, ZTOWER_Y,HOVER_HEIGHT);    //z hover
+  delay(50); // Give the motion planner time to pick up the command
+  
+  // Find the X tower button
+  moveToXYZ(XTOWER_X, XTOWER_Y,HOVER_HEIGHT);    //x hover
+  z=pressButton(XTOWER_X, XTOWER_Y, HOVER_HEIGHT, BUTTON_MIN);
+  xTower[X_AXIS]=XTOWER_X;
+  xTower[Y_AXIS]=XTOWER_Y;
+  xTower[Z_AXIS]=z+BUILD_PLANE_OFFSET;
+  moveToXYZ(XTOWER_X, XTOWER_Y,HOVER_HEIGHT);    //x hover
+  delay(50); // Give the motion planner time to pick up the command
+
+  // Find the Y tower button
+  moveToXYZ(YTOWER_X, YTOWER_Y,HOVER_HEIGHT);    //y hover
+  z=pressButton(YTOWER_X, YTOWER_Y, HOVER_HEIGHT, BUTTON_MIN);
+  yTower[X_AXIS]=YTOWER_X;
+  yTower[Y_AXIS]=YTOWER_Y;
+  yTower[Z_AXIS]=z+BUILD_PLANE_OFFSET;
+  moveToXYZ(YTOWER_X, YTOWER_Y,HOVER_HEIGHT);    //y hover
+  delay(50); // Give the motion planner time to pick up the command
+
+  SERIAL_ECHO("\nXYZ ");
+  SERIAL_ECHO(xTower[Z_AXIS]);
+  SERIAL_ECHO(", ");
+  SERIAL_ECHO(yTower[Z_AXIS]);
+  SERIAL_ECHO(", ");
+  SERIAL_ECHO(zTower[Z_AXIS]);
+  SERIAL_ECHO("\n");
+}
+#endif
 
