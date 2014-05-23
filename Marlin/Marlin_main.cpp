@@ -3696,7 +3696,7 @@ void doPlatformLeveling()
 
   pinMode(BUILD_PLANE_BUTTON_PIN,INPUT_PULLUP);
   float z;
-  moveToXYZ(0,0,50);        // center 
+  moveToXYZ(0,0,50);        // centroid 
 
   // Find the Z tower button
   moveToXYZ(ZTOWER_X, ZTOWER_Y,HOVER_HEIGHT);    //z hover
@@ -3704,7 +3704,8 @@ void doPlatformLeveling()
   zTower[X_AXIS]=ZTOWER_X;
   zTower[Y_AXIS]=ZTOWER_Y;
   zTower[Z_AXIS]=z;
-  moveToXYZ(ZTOWER_X, ZTOWER_Y,HOVER_HEIGHT);    //z hover
+  moveToXYZ(ZTOWER_X, ZTOWER_Y,HOVER_HEIGHT);   //z hover
+  moveToXYZ(0,0,50);        // centroid
   delay(50); // Give the motion planner time to pick up the command
   
   // Find the X tower button
@@ -3714,6 +3715,7 @@ void doPlatformLeveling()
   xTower[Y_AXIS]=XTOWER_Y;
   xTower[Z_AXIS]=z;
   moveToXYZ(XTOWER_X, XTOWER_Y,HOVER_HEIGHT);    //x hover
+  moveToXYZ(0,0,50);        // centroid
   delay(50); // Give the motion planner time to pick up the command
 
   // Find the Y tower button
@@ -3723,6 +3725,7 @@ void doPlatformLeveling()
   yTower[Y_AXIS]=YTOWER_Y;
   yTower[Z_AXIS]=z;
   moveToXYZ(YTOWER_X, YTOWER_Y,HOVER_HEIGHT);    //y hover
+  moveToXYZ(0,0,50);        // centroid
   delay(50); // Give the motion planner time to pick up the command
 
   SERIAL_ECHO("\nXYZ ");
