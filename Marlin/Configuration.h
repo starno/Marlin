@@ -107,10 +107,10 @@
 // NOTE NB all values for DELTA_* values MOUST be floating point, so always have a decimal point in them
 
 // Center-to-center distance of the holes in the diagonal push rods.
-#define DELTA_DIAGONAL_ROD 249.0 // mm
+#define DELTA_DIAGONAL_ROD 250.0 // mm
 
 // Horizontal offset from middle of printer to smooth rod center.
-#define DELTA_SMOOTH_ROD_OFFSET 195.0 // mm
+#define DELTA_SMOOTH_ROD_OFFSET 196.5 // mm
 
 // Horizontal offset of the universal joints on the end effector.
 #define DELTA_EFFECTOR_OFFSET 40.0 // mm
@@ -440,8 +440,8 @@ const bool Z_MAX_ENDSTOP_INVERTING = false; // set to true to invert the logic o
 // #define EXTRUDER_OFFSET_Y {0.0, 5.00}  // (in mm) for each extruder, offset of the hotend on the Y axis
 
 // The speed change that does not require acceleration (i.e. the software might assume it can be done instantaneously)
-#define DEFAULT_XYJERK                16.0    // (mm/sec)
-#define DEFAULT_ZJERK                 16.0    // (mm/sec) Must be same as XY for delta
+#define DEFAULT_XYJERK                14.0    // (mm/sec)
+#define DEFAULT_ZJERK                 14.0    // (mm/sec) Must be same as XY for delta
 #define DEFAULT_EJERK                 5.0    // (mm/sec)
 
 
